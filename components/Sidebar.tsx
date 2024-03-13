@@ -30,7 +30,7 @@ const Sidebar = () => {
       <div className="text-black flex relative  top-0">
         <nav className="fixed top-0 text-black bg-white p-4 w-[300px] h-screen overflow-y-auto custom-scrollbar">
           <Image
-            src="/logoOzi.svg"
+            src="/black-bull-logo.svg"
             alt="logo"
             width={150}
             height={100}

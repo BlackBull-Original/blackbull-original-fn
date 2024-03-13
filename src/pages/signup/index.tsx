@@ -129,7 +129,7 @@ const SignUp = () => {
     <React.Fragment>
       <div>
         <div className=" pt-4 pl-6 absolute">
-          <Image src="/logoOzi.svg" alt="logo" width={150} height={150} />
+          <Image src="/black-bull-logo.svg" alt="logo" width={150} height={150} />
         </div>
         <div>
           <Toaster />

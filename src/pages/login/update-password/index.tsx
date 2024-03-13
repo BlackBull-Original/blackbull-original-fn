@@ -10,7 +10,7 @@ const UpdatePassword = () => {
     <>
       <div>
         <div className=" pt-6 pl-8 absolute">
-          <Image src="/logoOzi.svg" alt="logo" width={130} height={50} />
+          <Image src="/black-bull-logo.svg" alt="logo" width={130} height={50} />
         </div>
         <div className="grid grid-cols-2 items-center">
           <form>
