@@ -54,9 +54,9 @@ const ImageUpload = ({handleSubmit}:any) => {
         <div className="flex justify-end my-6 gap-2">
           <Button
             text="Save"
-            className="!bg-transparent !text-black border border-[#e5e5e5] !px-8"
+            className="!bg-transparent !text-black border-[null] font-semibold border-[#e5e5e5] !px-8"
           />
-          <Button onClick={()=>handleSubmit()} text="Create" className="!px-8 bg-[#2B36D9]" />
+          <Button onClick={()=>handleSubmit()} text="Submit" className="!px-8 bg-[#2B36D9]" />
         </div>
       </div>
     </div>

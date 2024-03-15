@@ -15,6 +15,61 @@ const UserDetails = () => {
 
   const [users, setUsers] = useState([]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(20); // Number of items to display per page
+
+  // Get current items based on pagination
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = users.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Render vehicle items
+  const renderUserItems = () => {
+    return currentItems.map((item: any, index) => (
+      <div
+        key={index}
+        className="grid text-center grid-cols-[15%_15%_15%_15%_15%_15%_10%] p-4 border"
+      >
+        <React.Fragment key={item?._id}>
+          <p className="mb-4">{item?.firstName}</p>
+          <p className="mb-4">{item?.username}</p>
+          <p className="mb-4">{item?.role}</p>
+          <p className="mb-4">{item?.lastLogin || getCurrentDate()}</p>
+          <p className="mb-4">{item?.primaryGroup || "Entire Fleet"}</p>
+          <p className="mb-4">
+            <CommonUI status="Active" />
+          </p>
+          <div className="flex justify-center gap-2 mb-4">
+            {/* <Image
+                          src={"/edit.svg"}
+                          alt="edit"
+                          width={18}
+                          height={18}
+                          onClick={() => {
+                            router.push({
+                              pathname: "/onboarding/edit-user",
+                              query: { id: item?._id },
+                            });
+                          }}
+                          className="cursor-pointer"
+                        /> */}
+            <Image
+              src={"/trash.svg"}
+              alt="edit"
+              width={18}
+              height={18}
+              className="cursor-pointer"
+              onClick={() => {
+                setDelete(true);
+                setUserToDelete(item?._id);
+              }}
+            />
+          </div>
+        </React.Fragment>
+      </div>
+    ));
+  };
+
   const getUsers = async () => {
     const data = await getAllUser(token || "");
     if (data) {
@@ -43,8 +98,8 @@ const UserDetails = () => {
   function getCurrentDate() {
     const currentDate = new Date();
     const year = currentDate.getFullYear();
-    const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based
-    const day = String(currentDate.getDate()).padStart(2, '0');
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+    const day = String(currentDate.getDate()).padStart(2, "0");
 
     const formattedDate = `${year}-${month}-${day}`;
     return formattedDate;
@@ -53,11 +108,11 @@ const UserDetails = () => {
   return (
     <>
       <div className="mr-4">
-        <h2 className="bg-white w-full p-4 rounded-md font-bold">
+        <h2 className="bg-white w-full p-4 rounded-2xl font-bold">
           User Details
         </h2>
         <div>
-          <div className="mt-4 mb-20 bg-white p-4 rounded-md items-center ">
+          <div className="mt-4 mb-20 bg-white p-4 rounded-2xl items-center ">
             <div className="flex items-center justify-between">
               <h3 className="leading-loose font-semibold">
                 Existing User List
@@ -65,13 +120,13 @@ const UserDetails = () => {
               <div className="flex gap-2 relative">
                 <Button
                   text="Add User"
-                  className="px-4 rounded-xl"
+                  className="px-4 rounded-full"
                   onClick={() => router.push("/onboarding/user")}
                 />
               </div>
             </div>
             <div>
-              <div className="grid text-center grid-cols-[15%_15%_15%_15%_15%_15%_10%] bg-[#EFF2F3] p-4 rounded-md mt-4">
+              <div className="grid text-center grid-cols-[15%_15%_15%_15%_15%_15%_10%] bg-[#EFF2F3] p-4 rounded-2xl mt-4">
                 {driverDetailsHeading?.map((value, index) => {
                   return (
                     <>
@@ -82,32 +137,23 @@ const UserDetails = () => {
                   );
                 })}
               </div>
-              <div className="grid items-center text-center grid-cols-[15%_15%_15%_15%_15%_15%_10%] p-4 border justify-center">
+              {/* <div className="grid items-center text-center grid-cols-[15%_15%_15%_15%_15%_15%_10%] p-4 border justify-center">
                 {users?.map((item: any, ind: number) => {
                   return (
                     <React.Fragment key={item?._id}>
                       <p className="mb-4">{item?.firstName}</p>
                       <p className="mb-4">{item?.username}</p>
                       <p className="mb-4">{item?.role}</p>
-                      <p className="mb-4">{item?.lastLogin || getCurrentDate()}</p>
-                      <p className="mb-4">{item?.primaryGroup || "Entire Fleet"}</p>
+                      <p className="mb-4">
+                        {item?.lastLogin || getCurrentDate()}
+                      </p>
+                      <p className="mb-4">
+                        {item?.primaryGroup || "Entire Fleet"}
+                      </p>
                       <p className="mb-4">
                         <CommonUI status="Active" />
                       </p>
                       <div className="flex justify-center gap-2 mb-4">
-                        {/* <Image
-                          src={"/edit.svg"}
-                          alt="edit"
-                          width={18}
-                          height={18}
-                          onClick={() => {
-                            router.push({
-                              pathname: "/onboarding/edit-user",
-                              query: { id: item?._id },
-                            });
-                          }}
-                          className="cursor-pointer"
-                        /> */}
                         <Image
                           src={"/trash.svg"}
                           alt="edit"
@@ -123,7 +169,8 @@ const UserDetails = () => {
                     </React.Fragment>
                   );
                 })}
-              </div>
+              </div> */}
+              {renderUserItems()}
               {deletePopUp === true ? (
                 <>
                   <div className="w-screen h-screen  fixed top-0 left-0 backdrop-blur-md flex">
@@ -153,15 +200,56 @@ const UserDetails = () => {
                 ""
               )}
             </div>
+            {/* Pagination */}
             <div className="flex justify-between pt-4 bg-white  p-4">
-              <div>Showing 1 to 6 of 56 entries</div>
-              <div className="bg-[#CED7DB] w-8 h-8 rounded-full flex items-center justify-center cursor-pointer">
-                <Image
-                  src="/chevron_right.png"
-                  alt="chevron right"
-                  width={22}
-                  height={22}
-                />
+              <div>
+                Showing {indexOfFirstItem + 1} to{" "}
+                {Math.min(indexOfLastItem, users.length)} of{" "}
+                {users.length} entries
+              </div>
+              <div className="flex gap-2">
+                <div
+                  className={`bg-[#CED7DB] w-8 h-8 rounded-full flex items-center justify-center cursor-pointer ${
+                    currentPage === 1
+                      ? "bg-gray-100 cursor-not-allowed"
+                      : "bg-[#D9D9D9]"
+                  }`}
+                  onClick={() => {
+                    if (currentPage > 1) {
+                      setCurrentPage(currentPage - 1);
+                    }
+                  }}
+                >
+                  <Image
+                    src="/chevron_right.png"
+                    alt="chevron right"
+                    width={22}
+                    height={22}
+                    className="transform rotate-180"
+                  />
+                </div>
+                <div
+                  className={`bg-[#CED7DB] w-8 h-8 rounded-full flex items-center justify-center cursor-pointer ${
+                    currentPage === Math.ceil(users.length / itemsPerPage)
+                      ? "bg-gray-100 cursor-not-allowed"
+                      : "bg-[#D9D9D9]"
+                  }`}
+                  onClick={() => {
+                    if (
+                      currentPage !==
+                      Math.ceil(users.length / itemsPerPage)
+                    ) {
+                      setCurrentPage(currentPage + 1);
+                    }
+                  }}
+                >
+                  <Image
+                    src="/chevron_right.png"
+                    alt="chevron right"
+                    width={22}
+                    height={22}
+                  />
+                </div>
               </div>
             </div>
           </div>

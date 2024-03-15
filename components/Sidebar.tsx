@@ -30,14 +30,14 @@ const Sidebar = () => {
       <div className="text-black flex relative  top-0">
         <nav className="fixed top-0 text-black bg-white p-4 w-[300px] h-screen overflow-y-auto custom-scrollbar">
           <Image
-            src="/black-bull-logo.svg"
+            src="/logo.svg"
             alt="logo"
             width={150}
             height={100}
             className="m-auto"
           />
-          <div className="!bg-[#F8F8F8] px-[11px] py-1 mt-2  ">
-            <ul className="list-none px-3    mx-1  bg-white mb-4 mt-4 max-h-[calc(100% - 170px)] overflow-y-auto">
+          <div className="!bg-[#F8F8F8] rounded-2xl  px-[11px] py-1 mt-2  ">
+            <ul className="list-none px-3 rounded-2xl   mx-1  bg-white mb-4 mt-4 max-h-[calc(100% - 170px)] overflow-y-auto">
               {sidebarCollection.map((value, index) => {
                 return (
                   <>

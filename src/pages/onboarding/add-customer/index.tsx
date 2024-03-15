@@ -86,6 +86,7 @@ const AddCustomer = () => {
       state: "",
       country: "Australia",
       postCode: "",
+      otherState: ""
     },
 
     accountPayble: {
@@ -121,6 +122,8 @@ const AddCustomer = () => {
     },
     invoicePrefrences: "",
     invoiceCommunicationPrefrences: "",
+    otherInvoicePreferences: "",
+    otherInvoiceCommunicationPreferences: "",
     companySuiteDetails: [],
     payment: {
       accountName: "",
@@ -129,6 +132,7 @@ const AddCustomer = () => {
       accountNumber: "",
     },
     paymentTerm: "",
+    otherPaymentTerm: "",
     warehouseLocation: [],
     document: "",
   });
@@ -248,6 +252,7 @@ const AddCustomer = () => {
   });
   const [addMoreDirector, setAddMoreDirector] = useState<Array<any>>([]);
   const [addMoreAddress, setAddMoreAddress] = useState<Array<any>>([]);
+  console.log({ addMoreAddress })
   const [progress, setProgress] = useState(0);
   useEffect(() => {
     setProgressOfState({
@@ -325,7 +330,7 @@ const AddCustomer = () => {
     calculateProgress();
   }, [progressOfState]);
 
-  console.log("progressOfState", progressOfState);
+  console.log({ customer });
 
   // *********** Add More Director ********************************
 
@@ -374,6 +379,7 @@ const AddCustomer = () => {
           state: "",
           country: "Australia",
           postCode: "",
+          otherState: ""
         },
       ]);
     }
@@ -395,6 +401,7 @@ const AddCustomer = () => {
         state: "",
         country: "Australia",
         postCode: "",
+        otherState: "",
       },
     ]);
   };
@@ -534,22 +541,29 @@ const AddCustomer = () => {
         key !== "document" &&
         key !== "avatar" &&
         key !== "companySuiteDetails" &&
-        key !== "warehouseLocation"
+        key !== "warehouseLocation" &&
+        key !== "otherInvoicePreferences" &&
+        key !== "otherInvoiceCommunicationPreferences" &&
+        key !== "otherPaymentTerm"
       ) {
         if (typeof customer[key] === "object" && customer[key] !== null) {
           // Handle nested objects with a different logic
           Object.keys(customer[key]).forEach((nestedKey) => {
             const nestedKeyPath = `${key}Error.${nestedKey}`;
             if (
-              !customer[key][nestedKey] ||
-              customer[key][nestedKey] === undefined
+              nestedKey !== "otherState"
             ) {
-              newErrors[key + "Error"][nestedKey] = `${correctCustomerStateName(
-                nestedKey
-              )} is required in ${correctCustomerStateName(key)}`;
-              hasErrors = true;
-            } else {
-              newErrors[nestedKeyPath] = "";
+              if (
+                !customer[key][nestedKey] ||
+                customer[key][nestedKey] === undefined
+              ) {
+                newErrors[key + "Error"][nestedKey] = `${correctCustomerStateName(
+                  nestedKey
+                )} is required in ${correctCustomerStateName(key)}`;
+                hasErrors = true;
+              } else {
+                newErrors[nestedKeyPath] = "";
+              }
             }
           });
         } else {
@@ -577,7 +591,7 @@ const AddCustomer = () => {
   };
 
   console.log("State", customer);
-  console.log("Error", error);
+  console.log("Error", { error });
 
   const regexOfPhoneNumber = /^(?:\+61|0)[2-478](?:[ -]?[0-9]){8}$/;
   const regexOfEmail =
@@ -587,16 +601,16 @@ const AddCustomer = () => {
   return (
     <>
       {/* <Header /> */}
-      <div className="flex bg-[#F8F8F8]">
+      <div className="flex ml-[301px] ps-4 rounded-2xl bg-[#F8F8F8]">
         <div>
           <Toaster />
         </div>
         {/* <div className="sticky top-0">
           <Sidebar />
         </div> */}
-        <div className="ml-[316px] w-full mt-4">
-          <div className="bg-white mr-4 flex justify-between items-center rounded-md">
-            <h2 className=" w-full p-4 rounded-md font-bold text-[#16161D] text-[24px]">
+        <div className="w-full mt-4">
+          <div className="bg-white mr-4 flex justify-between items-center rounded-2xl">
+            <h2 className=" w-full p-4 rounded-2xl font-bold text-[#16161D] text-[24px]">
               Add Customer
             </h2>
             <div className="h-8 w-8 flex justify-center cursor-pointer text-2xl items-center bg-blueGrey-100 rounded-full mr-4">
@@ -605,7 +619,7 @@ const AddCustomer = () => {
               </span>
             </div>
           </div>
-          <div className="bg-white mr-4 px-4  mt-4 p-4 rounded-md">
+          <div className="bg-white mr-4 px-4  mt-4 p-4 rounded-2xl">
             <div className="mx-2">
               <Progressbar value={progress} />
             </div>
@@ -657,7 +671,7 @@ const AddCustomer = () => {
               </span>
             </div>
           </div>
-          <div className="bg-white mr-4 mt-4 rounded-md">
+          <div className="bg-white mr-4 mt-4 rounded-2xl">
             <h2 className="font-semibold p-4 text-[#151515] text-[18px]">
               Company Information
             </h2>
@@ -790,7 +804,7 @@ const AddCustomer = () => {
               />
             </div>
           </div>
-          <div className="bg-white mr-4 mt-4 rounded-md">
+          <div className="bg-white mr-4 mt-4 rounded-2xl">
             <h2 className="font-semibold p-4 text-[#151515] text-[18px]">
               Company Address
             </h2>
@@ -891,12 +905,23 @@ const AddCustomer = () => {
                     }
                   }}
                   errorMessage={error.companyAddressError?.state}
-                  // selectedData={selectedData}
-                  // setSelectedData={setSelectedData}
+                // selectedData={selectedData}
+                // setSelectedData={setSelectedData}
                 />
                 {customer?.companyAddress?.state === "Other" && (
                   <div className="mt-3">
-                    <Maininputfield label="Other" className="w-full" />
+                    <Maininputfield label="Other" className="w-full"
+                      value={customer.companyAddress.otherState}
+                      onChange={(e: any) => {
+                        setCustomer({
+                          ...customer,
+                          companyAddress: {
+                            ...customer.companyAddress,
+                            otherState: e.target.value,
+                          },
+                        });
+                      }}
+                    />
                   </div>
                 )}
               </div>
@@ -924,8 +949,8 @@ const AddCustomer = () => {
                   }
                 }}
                 errorMessage={error.companyAddressError?.country}
-                // selectedData={selectedData}
-                // setSelectedData={setSelectedData}
+              // selectedData={selectedData}
+              // setSelectedData={setSelectedData}
               />
               <Maininputfield
                 label="Post Code"
@@ -954,7 +979,7 @@ const AddCustomer = () => {
               />
             </div>
           </div>
-          <div className="bg-white mr-4 mt-4 rounded-md">
+          <div className="bg-white mr-4 mt-4 rounded-2xl">
             <h2 className="font-semibold p-4 text-[#151515] text-[18px]">
               Contact Information
             </h2>
@@ -1589,7 +1614,15 @@ const AddCustomer = () => {
               </div>
               {customer?.invoicePrefrences === "Other" && (
                 <div className="grid grid-cols-3 gap-4 ml-4 mb-4 mt-3">
-                  <Maininputfield label="Other" className="w-full" />
+                  <Maininputfield label="Other" className="w-full"
+                    value={customer?.otherInvoicePreferences}
+                    onChange={(e: any) => {
+                      setCustomer({
+                        ...customer,
+                        otherInvoicePreferences: e.target.value,
+                      });
+                    }}
+                  />
                 </div>
               )}
             </div>
@@ -1621,7 +1654,15 @@ const AddCustomer = () => {
               </div>
               {customer.invoiceCommunicationPrefrences === "Other" && (
                 <div className="grid grid-cols-3 gap-4 ml-4 mt-3 mb-4">
-                  <Maininputfield label="Other" className="w-full" />
+                  <Maininputfield label="Other" className="w-full"
+                    value={customer?.otherInvoiceCommunicationPreferences}
+                    onChange={(e: any) => {
+                      setCustomer({
+                        ...customer,
+                        otherInvoiceCommunicationPreferences: e.target.value,
+                      });
+                    }}
+                  />
                 </div>
               )}
             </div>
@@ -2007,7 +2048,12 @@ const AddCustomer = () => {
               </div>
               {customer?.paymentTerm === "Other" && (
                 <div className="grid grid-cols-3 gap-4 ml-4 mt-3">
-                  <Maininputfield label="Other" className="w-full" />
+                  <Maininputfield label="Other" className="w-full"
+                    value={customer?.otherPaymentTerm}
+                    onChange={(e: any) => {
+                      setCustomer({ ...customer, otherPaymentTerm: e.target.value });
+                    }}
+                  />
                 </div>
               )}
             </div>
@@ -2062,7 +2108,12 @@ const AddCustomer = () => {
                       />
                       {item?.state === "Other" && (
                         <div className="mt-4">
-                          <Maininputfield label="Other" className="w-full" />
+                          <Maininputfield label="Other" className="w-full"
+                            value={item?.otherState}
+                            onChange={(e: any) =>
+                              handleAddressChange(e, "otherState", index)
+                            }
+                          />
                         </div>
                       )}
                     </div>
@@ -2283,11 +2334,11 @@ const AddCustomer = () => {
           <div className="flex justify-end gap-4 my-4 px-4 mb-20">
             <Button
               text="Save"
-              className="!bg-transparent !w-fit border border-[#e5e5e5] !text-black px-8"
+              className="!bg-transparent !w-fit border-[null] font-semibold border-[#e5e5e5] !text-black px-8"
             />
             <Button
               onClick={handleSubmit}
-              text="Create"
+              text="Submit"
               className="!w-fit px-8"
             />
           </div>

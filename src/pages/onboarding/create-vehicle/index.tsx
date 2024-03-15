@@ -108,6 +108,16 @@ const CreateVehicle = () => {
     accountNumber: "",
     accountName: "",
     vehicleDocumentStatus: "Complete",
+
+    // =============================================== ADDITONAL FIELDS ADDED ON 04/03/2024 ===============================================
+    otherVehicleType: "",
+    otherTypeTrailer: "",
+    otherStateRegistration: "",
+    otherRegistrationStatus: "",
+    otherOwnershipStatus: "",
+    otherInsuranceCoverage: "",
+    otherInsuranceStatus: "",
+    otherSituation: ""
   });
 
   const [error, setError] = useState<any>({
@@ -184,8 +194,7 @@ const CreateVehicle = () => {
     calculateProgress();
   }, [vehicleDetails]);
 
-  console.log("vehicleDetails", vehicleDetails);
-  console.log("progress", progress);
+  console.log({ error })
   const handleInputChange = (id: any, value: any) => {
     setDocumentDataCollection((prevCollection: any) => {
       const updatedCollection = prevCollection.map((item: any) =>
@@ -243,17 +252,21 @@ const CreateVehicle = () => {
       ) {
         // Handle nested objects with a different logic
         Object.keys(vehicleDetails[key]).forEach((nestedKey) => {
-          const nestedKeyPath = `${key}Error.${nestedKey}`;
           if (
-            !vehicleDetails[key][nestedKey] ||
-            vehicleDetails[key][nestedKey] === undefined
+            nestedKey !== "otherState"
           ) {
-            newErrors[key + "Error"][
-              nestedKey
-            ] = `${nestedKey} is required in ${key}`;
-            hasErrors = true;
-          } else {
-            newErrors[nestedKeyPath] = "";
+            const nestedKeyPath = `${key}Error.${nestedKey}`;
+            if (
+              !vehicleDetails[key][nestedKey] ||
+              vehicleDetails[key][nestedKey] === undefined
+            ) {
+              newErrors[key + "Error"][
+                nestedKey
+              ] = `${nestedKey} is required in ${key}`;
+              hasErrors = true;
+            } else {
+              newErrors[nestedKeyPath] = "";
+            }
           }
         });
       } else {
@@ -275,7 +288,15 @@ const CreateVehicle = () => {
           key !== "bankName" &&
           key !== "accountNumber" &&
           key !== "accountName" &&
-          key !== "vehicleUploadDocument"
+          key !== "vehicleUploadDocument" &&
+          key !== "otherVehicleType" &&
+          key !== "otherTypeTrailer" &&
+          key !== "otherStateRegistration" &&
+          key !== "otherRegistrationStatus" &&
+          key !== "otherOwnershipStatus" &&
+          key !== "otherInsuranceCoverage" &&
+          key !== "otherInsuranceStatus" &&
+          key !== "otherSituation"
         ) {
           if (!vehicleDetails[key]) {
             newErrors[key + "Error"] = `${correctVehicleStateName(
@@ -314,50 +335,7 @@ const CreateVehicle = () => {
     setDocumentRender
   );
 
-  // const [selectedFiles, setSelectedFiles] = useState<
-  //   { id: number; file: File; currentDate: Date | null }[]
-  // >([]);
-
-  // const [selectedFileContent, setSelectedFileContent] = useState<string | null>(
-  //   null
-  // );
-  // const [isPreviewVisible, setIsPreviewVisible] = useState(false);
-
-  // const handleFileChanges = (
-  //   event: React.ChangeEvent<HTMLInputElement>,
-  //   documentId: number
-  // ) => {
-  //   const file = event.target.files ? event.target.files[0] : null;
-  //   const documentExists = documentDataCollection.find(
-  //     (doc: any) => doc.id === documentId
-  //   );
-  //   if (file && documentExists) {
-  //     const newSelectedFiles = [...selectedFiles];
-  //     const existingFileIndex = newSelectedFiles.findIndex(
-  //       (file) => file.id === documentId
-  //     );
-  //     const currentDate = new Date();
-  //     if (existingFileIndex !== -1) {
-  //       newSelectedFiles[existingFileIndex] = {
-  //         id: documentId,
-  //         file,
-  //         currentDate,
-  //       };
-  //     } else {
-  //       newSelectedFiles.push({ id: documentId, file, currentDate });
-  //     }
-  //     setSelectedFiles(newSelectedFiles);
-  //   }
-  // };
-
-  const [selectedFiles, setSelectedFiles] = useState<
-    {
-      id: number;
-      file: File;
-      currentDate: Date | null;
-      content: string | null;
-    }[]
-  >([]);
+  const [selectedFiles, setSelectedFiles] = useState<any>([]);
 
   const handleFileChanges = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -416,7 +394,9 @@ const CreateVehicle = () => {
 
   const handleOpenPreview = (documentId: number) => {
     // Open a new tab for the selected document ID
-    const selectedFile = selectedFiles.find((file) => file.id === documentId);
+    const selectedFile = selectedFiles.find(
+      (file: any) => file.id === documentId
+    );
 
     if (selectedFile?.content) {
       const newTab: any = window.open();
@@ -603,12 +583,12 @@ const CreateVehicle = () => {
 
   return (
     <>
-      <div className="flex bg-[#F8F8F8]">
+      <div className="flex ml-[301px] ps-4 rounded-2xl bg-[#F8F8F8]">
         <div>
           <Toaster />
         </div>
-        <div className="ml-[316px] w-full mt-4">
-          <div className="bg-white mr-4 flex justify-between items-center rounded-md">
+        <div className="w-full mt-4">
+          <div className="bg-white mr-4 flex justify-between items-center rounded-2xl">
             <h2 className=" w-full p-4 rounded-md font-bold text-[#16161D] text-[24px]">
               Add Vehicle
             </h2>
@@ -618,7 +598,7 @@ const CreateVehicle = () => {
               </span>
             </div>
           </div>
-          <div className="bg-white mr-4 px-4 rounded-md mt-4 p-4">
+          <div className="bg-white mr-4 px-4 rounded-2xl mt-4 p-4">
             <Progressbar value={progress} />
             <div>
               <h3 className="text-black w-full my-4 rounded-md font-semibold">
@@ -758,7 +738,15 @@ const CreateVehicle = () => {
 
                   {vehicleDetails.vehicleType === "Other" && (
                     <div className="mt-3">
-                      <Maininputfield label="Other" className="w-full" />
+                      <Maininputfield label="Other" className="w-full"
+                        value={vehicleDetails?.otherVehicleType}
+                        onChange={(e: any) => {
+                          setVehicleDetails({
+                            ...vehicleDetails,
+                            otherVehicleType: e.target.value,
+                          });
+                        }}
+                      />
                     </div>
                   )}
                 </div>
@@ -785,7 +773,15 @@ const CreateVehicle = () => {
                   />
                   {vehicleDetails.typeOfTrailer === "Other" && (
                     <div className="mt-3">
-                      <Maininputfield label="Other" className="w-full" />
+                      <Maininputfield label="Other" className="w-full"
+                        value={vehicleDetails?.otherTypeTrailer}
+                        onChange={(e: any) => {
+                          setVehicleDetails({
+                            ...vehicleDetails,
+                            otherTypeTrailer: e.target.value,
+                          });
+                        }}
+                      />
                     </div>
                   )}
                 </div>
@@ -831,7 +827,15 @@ const CreateVehicle = () => {
                   />
                   {vehicleDetails.stateOfRegistration === "Other" && (
                     <div className="mt-3">
-                      <Maininputfield label="Other" className="w-full" />
+                      <Maininputfield label="Other" className="w-full"
+                        value={vehicleDetails?.otherStateRegistration}
+                        onChange={(e: any) => {
+                          setVehicleDetails({
+                            ...vehicleDetails,
+                            otherStateRegistration: e.target.value,
+                          });
+                        }}
+                      />
                     </div>
                   )}
                 </div>
@@ -900,7 +904,15 @@ const CreateVehicle = () => {
                   />
                   {vehicleDetails.registrationStatus === "Other" && (
                     <div className="mt-3">
-                      <Maininputfield label="Other" className="w-full" />
+                      <Maininputfield label="Other" className="w-full"
+                        value={vehicleDetails?.otherRegistrationStatus}
+                        onChange={(e: any) => {
+                          setVehicleDetails({
+                            ...vehicleDetails,
+                            otherRegistrationStatus: e.target.value,
+                          });
+                        }}
+                      />
                     </div>
                   )}
                 </div>
@@ -927,7 +939,15 @@ const CreateVehicle = () => {
                   />
                   {vehicleDetails.ownershipStatus === "Other" && (
                     <div className="mt-3">
-                      <Maininputfield label="Other" className="w-full" />
+                      <Maininputfield label="Other" className="w-full"
+                        value={vehicleDetails?.otherOwnershipStatus}
+                        onChange={(e: any) => {
+                          setVehicleDetails({
+                            ...vehicleDetails,
+                            otherOwnershipStatus: e.target.value,
+                          });
+                        }}
+                      />
                     </div>
                   )}
                 </div>
@@ -1303,7 +1323,15 @@ const CreateVehicle = () => {
                     />
                     {vehicleDetails.insuranceCoverage === "Other" && (
                       <div className="mt-3">
-                        <Maininputfield label="Other" className="w-full" />
+                        <Maininputfield label="Other" className="w-full"
+                          value={vehicleDetails?.otherInsuranceCoverage}
+                          onChange={(e: any) => {
+                            setVehicleDetails({
+                              ...vehicleDetails,
+                              otherInsuranceCoverage: e.target.value,
+                            });
+                          }}
+                        />
                       </div>
                     )}
                   </div>
@@ -1330,7 +1358,15 @@ const CreateVehicle = () => {
                     />{" "}
                     {vehicleDetails.insuranceStatus === "Other" && (
                       <div className="mt-3">
-                        <Maininputfield label="Other" className="w-full" />
+                        <Maininputfield label="Other" className="w-full"
+                          value={vehicleDetails?.otherInsuranceStatus}
+                          onChange={(e: any) => {
+                            setVehicleDetails({
+                              ...vehicleDetails,
+                              otherInsuranceStatus: e.target.value,
+                            });
+                          }}
+                        />
                       </div>
                     )}
                   </div>
@@ -1357,7 +1393,15 @@ const CreateVehicle = () => {
                     />
                     {vehicleDetails.situation === "Other" && (
                       <div className="mt-3">
-                        <Maininputfield label="Other" className="w-full" />
+                        <Maininputfield label="Other" className="w-full"
+                          value={vehicleDetails?.otherSituation}
+                          onChange={(e: any) => {
+                            setVehicleDetails({
+                              ...vehicleDetails,
+                              otherSituation: e.target.value,
+                            });
+                          }}
+                        />
                       </div>
                     )}
                   </div>
@@ -1463,18 +1507,18 @@ const CreateVehicle = () => {
                         </div>
                         <div>
                           {selectedFiles.find(
-                            (file) => file.id === data?.id
+                            (file: any) => file.id === data?.id
                           ) ? (
                             <div>
                               <p>
                                 {selectedFiles.find(
-                                  (file) => file.id === data?.id
+                                  (file: any) => file.id === data?.id
                                 )?.currentDate
                                   ? formatDate(
-                                      selectedFiles.find(
-                                        (file) => file.id === data?.id
-                                      )?.currentDate
-                                    )
+                                    selectedFiles.find(
+                                      (file: any) => file.id === data?.id
+                                    )?.currentDate
+                                  )
                                   : "No date available"}
                               </p>
                             </div>
@@ -1483,13 +1527,14 @@ const CreateVehicle = () => {
                           )}
                         </div>
                         <div>
-                          {selectedFiles.find((file) => file.id === data?.id)
-                            ?.file ? (
+                          {selectedFiles.find(
+                            (file: any) => file.id === data?.id
+                          )?.file ? (
                             <div>
                               <p>
                                 {
                                   selectedFiles.find(
-                                    (file) => file.id === data?.id
+                                    (file: any) => file.id === data?.id
                                   )?.file.name
                                 }
                               </p>
@@ -1497,9 +1542,9 @@ const CreateVehicle = () => {
                           ) : (
                             <span
                               className="!w-fit m-auto  py-2 cursor-pointer  px-6 rounded-full mb-6 text-black"
-                              // onClick={() =>
-                              //   handleUploadFileWithId(data?.id, combinedObject)
-                              // }
+                            // onClick={() =>
+                            //   handleUploadFileWithId(data?.id, combinedObject)
+                            // }
                             >
                               No file Uploaded
                             </span>
@@ -1530,12 +1575,12 @@ const CreateVehicle = () => {
           <div className="mr-4 px-4 rounded-md mt-4 mb-20 p-4 flex justify-end gap-2">
             <Button
               text="Save"
-              className="!bg-transparent !text-[#000] border px-8 !rounded-xl text-sm border-[#032272]"
+              className="!bg-transparent !text-[#000] border-[null] font-semibold px-8 !rounded-xl text-sm border-[#032272]"
             />
             <Button
               onClick={handleSubmit}
-              text="Create"
-              className="px-8 !rounded-xl text-sm"
+              text="Submit"
+              className="px-8 !rounded-full text-sm"
             />
           </div>
         </div>

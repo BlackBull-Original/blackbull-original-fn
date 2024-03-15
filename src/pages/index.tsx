@@ -12,7 +12,7 @@ export default function Home() {
       <div className="h-screen flex items-center">
         <div className="max-w-[716px] m-auto text-center">
           <Image
-            src={"/black-bull-logo.svg"}
+            src={"/logo.svg"}
             alt="logo"
             width={180}
             height={90}

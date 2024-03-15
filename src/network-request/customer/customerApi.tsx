@@ -70,3 +70,35 @@ export const getAllCustomer = async (token: string) => {
       console.log("error", error);
     }
   };
+
+  // Bulk Upload
+
+export const uploadCustomerBulkDocuments = async (
+    token: any,
+    selectedFile: any
+  ) => {
+    // Create FormData object
+    const formData = new FormData();
+    formData.append("files", selectedFile);
+  
+    try {
+      // Send formData in the POST request
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/c1/importCustomers`,
+        formData,
+        {
+          withCredentials: false,
+          headers: {
+            "Content-Type": "multipart/form-data", // Use multipart/form-data for FormData
+            Authorization: `Basic ${token}`,
+          },
+        }
+      );
+  
+      console.log({ response });
+      return response.data;
+    } catch (error) {
+      console.log({ error });
+      return error;
+    }
+  };

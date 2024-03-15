@@ -95,6 +95,7 @@ const CreateDriver = () => {
       state: "",
       country: "Australia",
       pincode: "",
+      otherState: ""
     },
     permanentAddress: {
       houseNumber: "",
@@ -103,6 +104,7 @@ const CreateDriver = () => {
       state: "",
       country: "Australia",
       pincode: "",
+      otherState: ""
     },
 
     emergencyContactInformation: {
@@ -120,13 +122,18 @@ const CreateDriver = () => {
       expiryDate: "",
       daysLeftForRenewal: "",
       documents: "",
+      otherStateIssue: "",
+      otherLicenceType: "",
     },
     employmentHistory: [],
     specialDrivingLicence: {
       specialDrivingLicence: "",
     },
+    otherSpecialDrivingLicence: "",
     onboardingDocuments: [],
   });
+
+  console.log({ driverDetails })
 
   const [error, setError] = useState<any>({
     firstNameError: "",
@@ -174,6 +181,8 @@ const CreateDriver = () => {
       specialDrivingLicence: "",
     },
   });
+
+  console.log({ error })
 
   const [documentDataCollection, setDocumentDataCollection] = useState<any>([]);
 
@@ -300,8 +309,6 @@ const CreateDriver = () => {
     calculateProgress();
   }, [progressOfState]);
 
-  console.log("progressOfState", progressOfState);
-  console.log("progress", progress);
   const combinedObject = selectedFiles.reduce(
     (accumulator: any, currentItem: any) => {
       accumulator[currentItem.id] = {
@@ -436,17 +443,26 @@ const CreateDriver = () => {
     const newErrors = { ...error };
     let hasErrors = false;
     Object.keys(driverDetails).forEach((key) => {
+      console.log({ key })
       if (
         key !== "avatar" &&
         key !== "onboardingDocuments" &&
-        key !== "employmentHistory"
+        key !== "employmentHistory" &&
+        key !== "otherSpecialDrivingLicence"
       ) {
         if (
           typeof driverDetails[key] === "object" &&
           driverDetails[key] !== null
         ) {
           Object.keys(driverDetails[key]).forEach((nestedKey) => {
-            if (nestedKey !== "documents") {
+            if (
+
+              nestedKey !== "documents" &&
+              nestedKey !== "otherState" &&
+              nestedKey !== "otherLicenceType" &&
+              nestedKey !== "otherStateIssue"
+
+            ) {
               if (
                 !driverDetails[key][nestedKey] ||
                 driverDetails[key][nestedKey] === undefined
@@ -519,6 +535,7 @@ const CreateDriver = () => {
 
   const handleSubmit = async () => {
     const hasErrors = checkValidation();
+    console.log({ hasErrors })
     if (hasErrors) {
       toast("Please fix the validation errors before submitting.", {
         icon: "⚠️",
@@ -653,12 +670,12 @@ const CreateDriver = () => {
 
   return (
     <>
-      <div className="flex bg-[#F8F8F8]">
+      <div className="flex ml-[301px] ps-4 rounded-2xl bg-[#F8F8F8]">
         <div>
           <Toaster />
         </div>
-        <div className="ml-[316px] w-full mt-4">
-          <div className="bg-white mr-4 flex justify-between items-center rounded-md">
+        <div className=" w-full mt-4">
+          <div className="bg-white mr-4 flex justify-between items-center rounded-2xl">
             <h2 className=" w-full p-4 rounded-md font-bold text-[#16161D] text-[24px]">
               Add Driver
             </h2>
@@ -668,7 +685,7 @@ const CreateDriver = () => {
               </span>
             </div>
           </div>
-          <div className="bg-white mr-4 px-4 rounded-md mt-4 p-4">
+          <div className="bg-white mr-4 px-4 rounded-2xl mt-4 p-4">
             <div className="mx-2">
               <Progressbar value={progress} />
             </div>
@@ -977,7 +994,18 @@ const CreateDriver = () => {
                   />
                   {driverDetails.currentAddress?.state === "Other" && (
                     <div className="mt-3">
-                      <Maininputfield label="Other" className="w-full" />
+                      <Maininputfield label="Other" className="w-full"
+                        value={driverDetails.currentAddress.otherState}
+                        onChange={(e: any) => {
+                          setDriverDetails({
+                            ...driverDetails,
+                            currentAddress: {
+                              ...driverDetails.currentAddress,
+                              otherState: e.target.value,
+                            },
+                          });
+                        }}
+                      />
                     </div>
                   )}
                 </div>
@@ -1149,7 +1177,18 @@ const CreateDriver = () => {
                   />
                   {driverDetails.permanentAddress?.state === "Other" && (
                     <div className="mt-3">
-                      <Maininputfield label="Other" className="w-full" />
+                      <Maininputfield label="Other" className="w-full"
+                        value={driverDetails.permanentAddress.otherState}
+                        onChange={(e: any) => {
+                          setDriverDetails({
+                            ...driverDetails,
+                            permanentAddress: {
+                              ...driverDetails.permanentAddress,
+                              otherState: e.target.value,
+                            },
+                          });
+                        }}
+                      />
                     </div>
                   )}
                 </div>
@@ -1718,7 +1757,18 @@ const CreateDriver = () => {
                   />
                   {driverDetails?.licenseDetails.licenceType === "Other" && (
                     <div className="mt-3">
-                      <Maininputfield label="Other" className="w-full" />
+                      <Maininputfield label="Other" className="w-full"
+                        value={driverDetails?.licenseDetails?.otherLicenceType}
+                        onChange={(e: any) => {
+                          setDriverDetails({
+                            ...driverDetails,
+                            licenseDetails: {
+                              ...driverDetails.licenseDetails,
+                              otherLicenceType: e.target.value,
+                            },
+                          });
+                        }}
+                      />
                     </div>
                   )}
                 </div>
@@ -1751,7 +1801,18 @@ const CreateDriver = () => {
                   />
                   {driverDetails?.licenseDetails?.state === "Other" && (
                     <div className="mt-3">
-                      <Maininputfield label="Other" className="w-full" />
+                      <Maininputfield label="Other" className="w-full"
+                        value={driverDetails?.licenseDetails?.otherStateIssue}
+                        onChange={(e: any) => {
+                          setDriverDetails({
+                            ...driverDetails,
+                            licenseDetails: {
+                              ...driverDetails.licenseDetails,
+                              otherStateIssue: e.target.value,
+                            },
+                          });
+                        }}
+                      />
                     </div>
                   )}
                 </div>
@@ -1908,10 +1969,19 @@ const CreateDriver = () => {
                 </div>
                 {driverDetails?.specialDrivingLicence?.specialDrivingLicence ===
                   "Other" && (
-                  <div className="mt-3 grid grid-cols-3 gap-4">
-                    <Maininputfield label="Other" className="w-full" />
-                  </div>
-                )}
+                    <div className="mt-3 grid grid-cols-3 gap-4">
+                      <Maininputfield label="Other" className="w-full"
+                        value={driverDetails?.otherSpecialDrivingLicence}
+                        onChange={(e: any) => {
+                          setDriverDetails({
+                            ...driverDetails,
+                            otherSpecialDrivingLicence: e.target.value,
+                          });
+
+                        }}
+                      />
+                    </div>
+                  )}
               </div>
             </div>
           </div>
@@ -1995,9 +2065,9 @@ const CreateDriver = () => {
                         ) : (
                           <span
                             className="!w-fit m-auto  py-2 cursor-pointer  px-6 rounded-full mb-6 text-black"
-                            // onClick={() =>
-                            //   handleUploadFileWithId(data?.id, combinedObject)
-                            // }
+                          // onClick={() =>
+                          //   handleUploadFileWithId(data?.id, combinedObject)
+                          // }
                           >
                             No file Uploaded
                           </span>
@@ -2014,10 +2084,10 @@ const CreateDriver = () => {
                                   (file) => file.id === data?.id
                                 )?.currentDate
                                   ? formatDate(
-                                      selectedFiles.find(
-                                        (file) => file.id === data?.id
-                                      )?.currentDate
-                                    )
+                                    selectedFiles.find(
+                                      (file) => file.id === data?.id
+                                    )?.currentDate
+                                  )
                                   : "No date available"}
                               </p>
                             </div>

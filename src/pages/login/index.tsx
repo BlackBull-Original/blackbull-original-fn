@@ -117,7 +117,7 @@ const Login = () => {
       <div>
         <div className=" pt-6 pl-8 absolute">
           <Image
-            src="/black-bull-logo.svg"
+            src="/logo.svg"
             alt="logo"
             width={130}
             height={50}

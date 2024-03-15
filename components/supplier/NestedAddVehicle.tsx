@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Progressbar from "../Progressbar";
 import Maininputfield from "../Maininputfield";
 import DateWithoutDropdown from "../DateWithoutDropdown";
@@ -30,6 +30,25 @@ export const NestedAddVehicle = (props: any) => {
   const [documentRender, setDocumentRender] = React.useState("");
   // const [selectedUploadRegoDocument, setSelectedUploadRegoDocument] =
   //   React.useState("");
+
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const calculateProgress = () => {
+      const { vehicleDocuments, document, ...rest } = addVehicle;
+      // Count filled inputs (excluding the 'documents' array)
+      const filledInputs = Object.values(rest).filter(
+        (value) => value !== ""
+      ).length;
+
+      // Count total inputs (excluding the 'documents' array)
+      const totalInputs = Object.keys(rest).length;
+      const newProgress = (filledInputs / totalInputs) * 100;
+      setProgress(Math.ceil(newProgress));
+    };
+
+    calculateProgress();
+  }, [addVehicle]);
 
   const [selectedFiles, setSelectedFiles] = useState<
     {
@@ -277,15 +296,47 @@ export const NestedAddVehicle = (props: any) => {
     });
   };
 
+  // Function to calculate the difference in days
+  const calculateDaysDifference = () => {
+    const renewalDate: any = new Date(addVehicle.renewalDate);
+    const dateValidUntil: any = new Date(addVehicle.dateValidUntil);
+
+    // Calculate the difference in milliseconds
+    const differenceInMilliseconds = dateValidUntil - renewalDate;
+
+    // Convert milliseconds to days
+    const differenceInDays = Math.ceil(
+      differenceInMilliseconds / (1000 * 60 * 60 * 24)
+    );
+
+    setAddVehicle({
+      ...addVehicle,
+      daysLeft: differenceInDays.toString(),
+    });
+  };
+
+  useEffect(() => {
+    if (addVehicle.renewalDate !== "" && addVehicle.dateValidUntil !== "") {
+      calculateDaysDifference();
+    }
+  }, [addVehicle.renewalDate, addVehicle.dateValidUntil]);
+
   return (
     <div>
       <div>
-        <h3 className=" w-full p-4 rounded-md font-bold text-[#16161D] text-[24px]">
-          Add Vehicle
-        </h3>
+        <div className="bg-white mr-4 flex justify-between items-center rounded-2xl">
+          <h2 className=" w-full p-4 rounded-2xl font-bold text-[#16161D] text-[24px]">
+            Add Vehicle
+          </h2>
+          <div className="h-8 w-8 flex justify-center cursor-pointer text-2xl items-center bg-blueGrey-100 rounded-full mr-4">
+            <span className="mt-[-2px] ml-[2px] text-[#292D32] rotate-45">
+              +
+            </span>
+          </div>
+        </div>
       </div>
-      <div className="p-4 bg-white mr-4 mt-4 rounded-md">
-        <Progressbar />
+      <div className="p-4 bg-white mr-4 mt-4 rounded-2xl">
+        <Progressbar value={progress} />
 
         <h4 className="text-black font-semibold text-sm my-4">
           Vehicle Information
@@ -402,7 +453,17 @@ export const NestedAddVehicle = (props: any) => {
             />
             {addVehicle.vehicleType === "Other" && (
               <div className="mt-3">
-                <Maininputfield label="Other" className="w-full" />
+                <Maininputfield
+                  value={addVehicle.otherVehicleType}
+                  onChange={(e: any) => {
+                    setAddVehicle({
+                      ...addVehicle,
+                      otherVehicleType: e.target.value,
+                    });
+                  }}
+                  label="Other"
+                  className="w-full"
+                />
               </div>
             )}
           </div>
@@ -427,7 +488,17 @@ export const NestedAddVehicle = (props: any) => {
             />
             {addVehicle.typeOfTrailer === "Other" && (
               <div className="mt-3">
-                <Maininputfield label="Other" className="w-full" />
+                <Maininputfield
+                  value={addVehicle.otherTypeOfTrailer}
+                  onChange={(e: any) => {
+                    setAddVehicle({
+                      ...addVehicle,
+                      otherTypeOfTrailer: e.target.value,
+                    });
+                  }}
+                  label="Other"
+                  className="w-full"
+                />
               </div>
             )}
           </div>
@@ -452,7 +523,17 @@ export const NestedAddVehicle = (props: any) => {
             />
             {addVehicle.stateOfRegistration === "Other" && (
               <div className="mt-3">
-                <Maininputfield label="Other" className="w-full" />
+                <Maininputfield
+                  value={addVehicle.otherStateOfRegistration}
+                  onChange={(e: any) => {
+                    setAddVehicle({
+                      ...addVehicle,
+                      otherStateOfRegistration: e.target.value,
+                    });
+                  }}
+                  label="Other"
+                  className="w-full"
+                />
               </div>
             )}
           </div>
@@ -493,24 +574,41 @@ export const NestedAddVehicle = (props: any) => {
             }}
             errorMessage={error.compliancePlateError}
           />
-          <Maindatefield
-            label="Registration Status"
-            value={addVehicle.registrationStatus}
-            className="w-full"
-            onChange={(e: any) => {
-              setAddVehicle({
-                ...addVehicle,
-                registrationStatus: e.target.value,
-              });
-              if (e.target.value.length > 0) {
-                setError({
-                  ...error,
-                  registrationStatusError: "",
+          <div>
+            <DropDownMap
+              label="Registration Status"
+              mapOption={registrationStatusCollection}
+              value={addVehicle.registrationStatus}
+              onChange={(e: any) => {
+                setAddVehicle({
+                  ...addVehicle,
+                  registrationStatus: e.target.value,
                 });
-              }
-            }}
-            errorMessage={error.registrationStatusError}
-          />
+                if (e.target.value.length > 0) {
+                  setError({
+                    ...error,
+                    registrationStatusError: "",
+                  });
+                }
+              }}
+              errorMessage={error.registrationStatusError}
+            />
+            {addVehicle.registrationStatus === "Other" && (
+              <div className="mt-3">
+                <Maininputfield
+                  value={addVehicle.otherRegistrationStatus}
+                  onChange={(e: any) => {
+                    setAddVehicle({
+                      ...addVehicle,
+                      otherRegistrationStatus: e.target.value,
+                    });
+                  }}
+                  label="Other"
+                  className="w-full"
+                />
+              </div>
+            )}
+          </div>
         </div>
         <div className="mt-4 w-fit">
           <FileUpload
@@ -614,6 +712,7 @@ export const NestedAddVehicle = (props: any) => {
               }
             }}
             errorMessage={error.dateValidUntilError}
+            min={addVehicle.renewalDate}
           />
 
           <Maininputfield
@@ -662,7 +761,17 @@ export const NestedAddVehicle = (props: any) => {
             />
             {addVehicle.insuranceCoverage === "Other" && (
               <div className="mt-3">
-                <Maininputfield label="Other" className="w-full" />
+                <Maininputfield
+                  value={addVehicle.otherInsuranceCoverage}
+                  onChange={(e: any) => {
+                    setAddVehicle({
+                      ...addVehicle,
+                      otherInsuranceCoverage: e.target.value,
+                    });
+                  }}
+                  label="Other"
+                  className="w-full"
+                />
               </div>
             )}
           </div>
@@ -687,7 +796,17 @@ export const NestedAddVehicle = (props: any) => {
             />
             {addVehicle.insuranceStatus === "Other" && (
               <div className="mt-3">
-                <Maininputfield label="Other" className="w-full" />
+                <Maininputfield
+                  value={addVehicle.otherInsuranceStatus}
+                  onChange={(e: any) => {
+                    setAddVehicle({
+                      ...addVehicle,
+                      otherInsuranceStatus: e.target.value,
+                    });
+                  }}
+                  label="Other"
+                  className="w-full"
+                />
               </div>
             )}
           </div>
@@ -712,7 +831,17 @@ export const NestedAddVehicle = (props: any) => {
             />
             {addVehicle.situation === "Other" && (
               <div className="mt-3">
-                <Maininputfield label="Other" className="w-full" />
+                <Maininputfield
+                  value={addVehicle.otherSituation}
+                  onChange={(e: any) => {
+                    setAddVehicle({
+                      ...addVehicle,
+                      otherSituation: e.target.value,
+                    });
+                  }}
+                  label="Other"
+                  className="w-full"
+                />
               </div>
             )}
           </div>
@@ -753,7 +882,7 @@ export const NestedAddVehicle = (props: any) => {
             </button>
           </div>
 
-          <div className="grid grid-cols-[16%_16%_16%_16%_16%_20%] text-black bg-[#EFF2F3] py-4 rounded-md flex text-center">
+          <div className="grid grid-cols-[16%_16%_16%_16%_16%_20%] text-black bg-[#EFF2F3] py-4 rounded-2xl flex text-center">
             {vehicleDocumentCollection?.map((value, index) => {
               return (
                 <>
@@ -926,6 +1055,24 @@ const registrationStateCollection = [
   },
   {
     value: "Western Australia",
+  },
+  {
+    value: "Other",
+  },
+];
+
+const registrationStatusCollection = [
+  {
+    value: "Active",
+  },
+  {
+    value: "Cancelled",
+  },
+  {
+    value: "Suspended",
+  },
+  {
+    value: "Renewal Pending",
   },
   {
     value: "Other",

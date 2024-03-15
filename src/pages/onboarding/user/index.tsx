@@ -69,7 +69,9 @@ const User = () => {
         key !== "requirePassword" &&
         key !== "sendPassword" &&
         key !== "temporaryPassword" &&
-        key !== "avatar"
+        key !== "avatar" &&
+        key !== "otherDomains" &&
+        key !== "otherRole"
       ) {
         if (!user[key]) {
           newErrors[key + "Error"] = `${correctUserStateName(key)} is required`;
@@ -120,11 +122,13 @@ const User = () => {
     number: "",
     username: "",
     domains: "",
+    otherDomains: "",
     avatar: "",
     employeeId: "",
     accessLevel: "",
     designation: "",
     role: "",
+    otherRole: "",
     temporaryPassword: false,
     password: "",
     confirmPassword: "",
@@ -236,13 +240,13 @@ const User = () => {
 
   return (
     <>
-      <div className="flex bg-[#F8F8F8]">
+      <div className="flex ml-[301px] ps-4 rounded-2xl bg-[#F8F8F8]">
         <div>
           <Toaster />
         </div>
-        <div className="ml-[316px] w-full mt-4">
-          <div className="bg-white mr-4 flex justify-between items-center rounded-md">
-            <h2 className=" w-full p-4 rounded-md font-bold text-black">
+        <div className="w-full mt-4">
+          <div className="bg-white mr-4 flex justify-between items-center rounded-2xl">
+            <h2 className=" w-full p-4 rounded-2xl font-bold text-black">
               Create User
             </h2>
             <div className="h-8 w-8 flex justify-center cursor-pointer text-2xl items-center bg-blueGrey-100 rounded-full mr-4">
@@ -251,7 +255,7 @@ const User = () => {
               </span>
             </div>
           </div>
-          <div className="bg-white mr-4 px-4 rounded-md mt-4 p-4 mb-20">
+          <div className="bg-white mr-4 px-4 rounded-2xl mt-4 p-4 mb-20">
             <div className="mx-2">
               <Progressbar value={progress} />
             </div>
@@ -454,7 +458,15 @@ const User = () => {
                   />
                   {user?.domains === "Other" && (
                     <div className="mt-3">
-                      <Maininputfield label="Other" className="w-full" />
+                      <Maininputfield label="Other" className="w-full"
+                        value={user?.otherDomains}
+                        onChange={(e: any) => {
+                          setUser({
+                            ...user,
+                            otherDomains: e.target.value,
+                          });
+                        }}
+                      />
                     </div>
                   )}
                 </div>
@@ -548,7 +560,15 @@ const User = () => {
                 </div>
                 {user?.role === "Other" && (
                   <div className="mt-3 grid grid-cols-3 gap-4">
-                    <Maininputfield label="Other" className="w-full" />
+                    <Maininputfield label="Other" className="w-full"
+                      value={user?.otherRole}
+                      onChange={(e: any) => {
+                        setUser({
+                          ...user,
+                          otherRole: e.target.value,
+                        });
+                      }}
+                    />
                   </div>
                 )}
               </div>
@@ -613,12 +633,12 @@ const User = () => {
             </div>
             <div className="flex justify-end gap-2 mt-4">
               <Button
-                text="Cancel"
-                className="!bg-transparent !text-black border border-[#e5e5e5] px-6"
+                text="Save"
+                className="!bg-transparent !text-black border-[null] font-semibold border-[#e5e5e5] px-6"
               />
               <Button
                 onClick={createUserHandler}
-                text="Create"
+                text="Add"
                 className="px-6"
               />
             </div>
